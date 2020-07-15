@@ -107,16 +107,22 @@ public:
 };
 
 template<typename DSPType, typename... Args>
-inline std::unique_ptr<AudioProcessor> make_dsp_wrapper(std::vector<DSP_Parameter> params, Args... args)
+inline std::unique_ptr<AudioProcessor> make_dsp_wrapper2(std::vector<DSP_Parameter> params, Args... args)
 {
     return std::make_unique<DSPWrapper<DSPType>>(params, args...);
+}
+
+template<template<class...> typename DSPType, typename... Args>
+inline std::unique_ptr<AudioProcessor> make_dsp_wrapper(std::vector<DSP_Parameter> params, Args... args)
+{
+    return std::make_unique<DSPWrapper<DSPType<float>>>(params, args...);
 }
 
 //==============================================================================
 int main (int argc, char* argv[])
 {
-    auto proc1 = make_dsp_wrapper<dsp::DelayLine<float>>({{"DELAYTIME","Delay",10.0f,44100.0f,22050.f}},44100);
-    auto proc2 = make_dsp_wrapper<dsp::Panner<float>>({{"PAN","Pan",-1.0f,1.0f,0.0f}});
+    auto proc1 = make_dsp_wrapper<dsp::DelayLine>({{"DELAYTIME","Delay",10.0f,44100.0f,22050.f}},44100);
+    auto proc2 = make_dsp_wrapper<dsp::Panner>({{"PAN","Pan",-1.0f,1.0f,0.0f}});
     // DSPWrapper<juce::dsp::Panner<float>> proc;
     AudioBuffer<float> buf(1,512);
     MidiBuffer dbuf;
