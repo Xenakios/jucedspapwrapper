@@ -73,9 +73,14 @@ public:
     
     void processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &midiMessages) override
     {
-        auto par = dynamic_cast<AudioParameterFloat*>(getParameters()[0]);
-        float parVal = *par;
-        wrapper_setParameter(m_dsp, 0, parVal);
+        auto& pars = getParameters();
+        for (int i=0;i<pars.size();++i)
+        {
+            auto par = dynamic_cast<AudioParameterFloat*>(pars[i]);
+            float parVal = *par;
+            wrapper_setParameter(m_dsp, 0, parVal);
+        }
+        
         dsp::AudioBlock<float> block(buffer);
         m_dsp.process(dsp::ProcessContextReplacing<float>(block));
     }
